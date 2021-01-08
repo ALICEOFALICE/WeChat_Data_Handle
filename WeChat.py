@@ -1,6 +1,7 @@
 import werobot
-import re
+
 from MiYouShe import *
+from video_info import *
 
 robot = werobot.WeRoBot(token='123456789')
 test = get_MiYouShe()
@@ -10,6 +11,7 @@ test = get_MiYouShe()
 def echo(message):
     User = message.content
     MiYouShe = get_MiYouShe()
+
     if re.match('bh3', User):
         UID = message.content
         UID = re.sub("bh3", "", UID)
@@ -22,10 +24,12 @@ def echo(message):
         UID = message.content
         UID = re.sub("mys", "", UID)
         tag = MiYouShe.get_UID_MiYouShe_info(UID)
+    elif re.match('BV', User):
+        UID = message.content
+        tag = bilibili_info().get_video_info(UID)
     else:
-        note = "----------*-----------\n" + "            米哈游查询助手        " + "\n原神查询------ys+米游社UID" \
-                                                                            "\n崩坏3查询 ---bh3 + 米游社UID" + "\n米游社查询---mys+米游社UID"
-    tag = note
+        tag = ("----------*-----------\n" + (" "*4)+"桜火查询助手" +(" "*4) + "\n原神查询------ys+米游社UID"+ \
+            "\n崩坏3查询 ---bh3 + 米游社UID" + "\n米游社查询---mys+米游社UID"+"\nB站视频查询---BV号")
     return tag
 
 

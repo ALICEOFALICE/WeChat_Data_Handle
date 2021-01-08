@@ -1,6 +1,8 @@
+import random
+import string
+import time
+
 import requests
-import json
-import time, datetime
 
 
 class get_MiYouShe:
@@ -8,6 +10,31 @@ class get_MiYouShe:
         self.cookie = ""
         self.headers = {"user_Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Geck\
         o) Chrome/81.0.4044.113 Safari/537.36"}
+
+    def get_ds(self):
+        # v2.3.0-web @povsister & @journey-ad
+        n = 'h8w582wxwgqvahcdkpvdhbh2w9casgfl'
+        i = str(int(time.time()))
+        r = ''.join(random.sample(string.ascii_lowercase + string.digits, 6))
+        c = self.hexdigest('salt=' + n + '&t=' + i + '&r=' + r)
+        return '{},{},{}'.format(i, r, c)
+
+    def get_Header(self):
+        headers = {"DS": +self.get_ds(),
+                   "cookie": "stuid=20934997;stoken=F1Lk01HQpbMkphLe7vGZIOcuYWCv9VWT6JXOpyfN;",
+                   "x-rpc-client_type": "2",
+                   "x-rpc-app_version": "2.3.0",
+                   "x-rpc-sbh3_version": "11",
+                   "x-rpc-channel": "miyousheluodi",
+                   "x-rpc-device_id": "14ae08d4-8706-3728-9e96-45e6ea3b5b07",
+                   "x-rpc-device_name": "Xiaomi Redmi K30 Pro",
+                   "x-rpc-device_model": "Redmi K30 Pro",
+                   "Referer": "https://app.mihoyo.com",
+                   "Host": "api-takumi.mihoyo.com",
+                   "Connection": "Keep-Alive",
+                   "Accept-Encoding": "gzip",
+                   }
+        return headers
 
     def get_UID_MiYouShe_info(self, UID):
         urls = "https://bbs-api.mihoyo.com/user/wapi/getUserFullInfo?gids=2&uid=" + str(UID)
@@ -48,23 +75,8 @@ class get_MiYouShe:
 
     def get_UID_MiYouShe_ys(self, UID):
         payload = {"uid": str(UID)}
-        cookies = {"DS": "1610096818,o21jnm,9bc9d36a6788ba0321110f1a42f452bd", \
-                   "cookie": "stuid=20934997;stoken=F1Lk01HQpbMkphLe7vGZIOcuYWCv9VWT6JXOpyfN;", \
-                   "x-rpc-client_type": "2", \
-                   "x-rpc-app_version": "2.3.0", \
-                   "x-rpc-sys_version": "11", \
-                   "x-rpc-channel": "miyousheluodi", \
-                   "x-rpc-device_id": "14ae08d4-8706-3728-9e96-45e6ea3b5b07", \
-                   "x-rpc-device_name": "Xiaomi Redmi K30 Pro", \
-                   "x-rpc-device_model": "Redmi K30 Pro", \
-                   "Referer": "https://app.mihoyo.com", \
-                   "Host": "api-takumi.mihoyo.com", \
-                   "Connection": "Keep-Alive", \
-                   "Accept-Encoding": "gzip", \
-                   }
         urls = "https://api-takumi.mihoyo.com/game_record/card/api/getGameRecordCard"
-        MIYouShe_ys_json = requests.get(urls, params=payload, headers=cookies)
-        MIYouShe_ys_jsons = MIYouShe_ys_json
+        MIYouShe_ys_json = requests.get(urls, params=payload, headers=self.get_Header())
         UID_name = (MIYouShe_ys_json.json())["data"]["list"][0]["game_role_id"]
         Ys_Game_ID = (MIYouShe_ys_json.json())["data"]["list"][0]["game_role_id"]
         YS_Game_Name = (MIYouShe_ys_json.json())["data"]["list"][0]["nickname"]
@@ -82,22 +94,9 @@ class get_MiYouShe:
 
     def get_UID_MiYouShe_bh3(self, UID):
         payload = {"uid": str(UID)}
-        cookies = {"DS": "1610096818,o21jnm,9bc9d36a6788ba0321110f1a42f452bd", \
-                   "cookie": "stuid=20934997;stoken=F1Lk01HQpbMkphLe7vGZIOcuYWCv9VWT6JXOpyfN;", \
-                   "x-rpc-client_type": "2", \
-                   "x-rpc-app_version": "2.3.0", \
-                   "x-rpc-sbh3_version": "11", \
-                   "x-rpc-channel": "miyousheluodi", \
-                   "x-rpc-device_id": "14ae08d4-8706-3728-9e96-45e6ea3b5b07", \
-                   "x-rpc-device_name": "Xiaomi Redmi K30 Pro", \
-                   "x-rpc-device_model": "Redmi K30 Pro", \
-                   "Referer": "https://app.mihoyo.com", \
-                   "Host": "api-takumi.mihoyo.com", \
-                   "Connection": "Keep-Alive", \
-                   "Accept-Encoding": "gzip", \
-                   }
+
         urls = "https://api-takumi.mihoyo.com/game_record/card/api/getGameRecordCard"
-        MIYouShe_bh3_json = requests.get(urls, params=payload, headers=cookies)
+        MIYouShe_bh3_json = requests.get(urls, params=payload, headers=self.get_Header())
 
         bh3_Game_ID = (MIYouShe_bh3_json.json())["data"]["list"][1]["game_role_id"]
         bh3_Game_Name = (MIYouShe_bh3_json.json())["data"]["list"][1]["nickname"]
