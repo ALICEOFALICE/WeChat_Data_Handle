@@ -77,5 +77,38 @@ class get_MiYouShe:
         _result = "\n游戏内ID：" + str(Ys_Game_ID) + "\n游戏内名称：" + YS_Game_Name + "\n服务器：" + Ys_Game_Region + \
                   "\n等级：" + str(Ys_Game_Leve) + "\n活跃天数：" + str(Ys_Game_Day) + "\n拥有角色数量" + \
                   str(Ys_Game_role_num) + "\n完成成就数：" + str(Ys_Game_achi_num) + "\n深境螺旋：" + str(Ys_Game_tower_num)
-        _result = "----------*-----------\n" + "       原神玩家数据      " + _result
+        _result = "----------*-----------\n" + "            原神玩家数据        " + _result
+        return _result
+
+    def get_UID_MiYouShe_bh3(self, UID):
+        payload = {"uid": str(UID)}
+        cookies = {"DS": "1610096818,o21jnm,9bc9d36a6788ba0321110f1a42f452bd", \
+                   "cookie": "stuid=20934997;stoken=F1Lk01HQpbMkphLe7vGZIOcuYWCv9VWT6JXOpyfN;", \
+                   "x-rpc-client_type": "2", \
+                   "x-rpc-app_version": "2.3.0", \
+                   "x-rpc-sbh3_version": "11", \
+                   "x-rpc-channel": "miyousheluodi", \
+                   "x-rpc-device_id": "14ae08d4-8706-3728-9e96-45e6ea3b5b07", \
+                   "x-rpc-device_name": "Xiaomi Redmi K30 Pro", \
+                   "x-rpc-device_model": "Redmi K30 Pro", \
+                   "Referer": "https://app.mihoyo.com", \
+                   "Host": "api-takumi.mihoyo.com", \
+                   "Connection": "Keep-Alive", \
+                   "Accept-Encoding": "gzip", \
+                   }
+        urls = "https://api-takumi.mihoyo.com/game_record/card/api/getGameRecordCard"
+        MIYouShe_bh3_json = requests.get(urls, params=payload, headers=cookies)
+
+        bh3_Game_ID = (MIYouShe_bh3_json.json())["data"]["list"][1]["game_role_id"]
+        bh3_Game_Name = (MIYouShe_bh3_json.json())["data"]["list"][1]["nickname"]
+        bh3_Game_Region = (MIYouShe_bh3_json.json())["data"]["list"][1]["region_name"]
+        bh3_Game_Leve = (MIYouShe_bh3_json.json())["data"]["list"][1]["level"]
+        bh3_Game_Day = (MIYouShe_bh3_json.json())["data"]["list"][1]["data"][0]["value"]
+        bh3_Game_role_num = (MIYouShe_bh3_json.json())["data"]["list"][1]["data"][1]["value"]
+        bh3_Game_achi_num = (MIYouShe_bh3_json.json())["data"]["list"][1]["data"][2]["value"]
+        bh3_Game_tower_num = (MIYouShe_bh3_json.json())["data"]["list"][1]["data"][3]["value"]
+        _result = "\n游戏内ID：" + str(bh3_Game_ID) + "\n游戏内名称：" + bh3_Game_Name + "\n服务器：" + bh3_Game_Region + \
+                  "\n等级：" + str(bh3_Game_Leve) + "\n累计登舰：" + str(bh3_Game_Day) + "\n圣痕数：" + \
+                  str(bh3_Game_role_num) + "\n装甲数：" + str(bh3_Game_achi_num) + "\n服装数：" + str(bh3_Game_tower_num)
+        _result = "----------*-----------\n" + "            崩坏3玩家数据        " + _result
         return _result
