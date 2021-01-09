@@ -1,7 +1,7 @@
 import random
 import string
 import time
-
+import hashlib
 import requests
 
 
@@ -11,29 +11,36 @@ class get_MiYouShe:
         self.headers = {"user_Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Geck\
         o) Chrome/81.0.4044.113 Safari/537.36"}
 
-    def get_ds(self):
-        # v2.3.0-web @povsister & @journey-ad
+    def hexdigest(self, text):
+        md5 = self.md5()
+        md5.update(text.encode())
+        return md5.hexdigest()
+
+    def md5(self, text):
+        md5 = hashlib.md5()
+        md5.update(text.encode())
+        return md5.hexdigest()
+    def getDS(self):
         n = 'h8w582wxwgqvahcdkpvdhbh2w9casgfl'
         i = str(int(time.time()))
         r = ''.join(random.sample(string.ascii_lowercase + string.digits, 6))
-        c = self.hexdigest('salt=' + n + '&t=' + i + '&r=' + r)
-        return '{},{},{}'.format(i, r, c)
+        c = get_MiYouShe().md5("salt=" + n + "&t=" + i + "&r=" + r)
+        print("{},{},{}".format(i, r, c))
+        return "{},{},{}".format(i, r, c)
 
     def get_Header(self):
-        headers = {"DS": +self.get_ds(),
-                   "cookie": "stuid=20934997;stoken=F1Lk01HQpbMkphLe7vGZIOcuYWCv9VWT6JXOpyfN;",
-                   "x-rpc-client_type": "2",
-                   "x-rpc-app_version": "2.3.0",
-                   "x-rpc-sbh3_version": "11",
-                   "x-rpc-channel": "miyousheluodi",
-                   "x-rpc-device_id": "14ae08d4-8706-3728-9e96-45e6ea3b5b07",
-                   "x-rpc-device_name": "Xiaomi Redmi K30 Pro",
-                   "x-rpc-device_model": "Redmi K30 Pro",
-                   "Referer": "https://app.mihoyo.com",
-                   "Host": "api-takumi.mihoyo.com",
-                   "Connection": "Keep-Alive",
-                   "Accept-Encoding": "gzip",
-                   }
+        headers = {
+            "Accept":"application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding":"gzip, deflate, br",
+            "Accept-Language":"zh-CN",
+            "x-rpc-client_type":"5",
+            "DS":(self.getDS()),
+            "x-rpc-app_version":"2.3.0",
+            "User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) miHoYoBBS/2.3.0 Edg/88.0.4324.50",
+            "Origin":"https://webstatic.mihoyo.com",
+            "Referer":"https://webstatic.mihoyo.com/",
+            "Cookie":"UM_distinctid=17640c883e881e-0b0158e275dc8b-5a301d45-1fa400-17640c883e9b52; _MHYUUID=b8d0a43f-11f8-4fc1-a08c-2f3fa16d373a; _gid=GA1.2.811078272.1610010362; account_id=20934997; cookie_token=9s3s1IPuXFz3c1cLthZYpXmW8Hp38atkKHU0lJDd; ltoken=eYUYQm65nUHBpPaeopzwJrksdE0KCopDGxoRmUs0; ltuid=20934997; _ga_KJ6J9V9VZQ=GS1.1.1610016172.3.1.1610017600.0; _ga=GA1.2.561767950.1607404652"
+        }
         return headers
 
     def get_UID_MiYouShe_info(self, UID):
@@ -74,9 +81,11 @@ class get_MiYouShe:
         return user_normal + MIYouShe_LEVEL
 
     def get_UID_MiYouShe_ys(self, UID):
+
         payload = {"uid": str(UID)}
-        urls = "https://api-takumi.mihoyo.com/game_record/card/api/getGameRecordCard"
-        MIYouShe_ys_json = requests.get(urls, params=payload, headers=self.get_Header())
+        urls = "https://api-takumi.mihoyo.com/game_record/card/wapi/getGameRecordCard?"
+        MIYouShe_ys_json = requests.get(urls, params=payload,headers=self.get_Header())
+        print(MIYouShe_ys_json)
         UID_name = (MIYouShe_ys_json.json())["data"]["list"][0]["game_role_id"]
         Ys_Game_ID = (MIYouShe_ys_json.json())["data"]["list"][0]["game_role_id"]
         YS_Game_Name = (MIYouShe_ys_json.json())["data"]["list"][0]["nickname"]
@@ -87,7 +96,7 @@ class get_MiYouShe:
         Ys_Game_achi_num = (MIYouShe_ys_json.json())["data"]["list"][0]["data"][2]["value"]
         Ys_Game_tower_num = (MIYouShe_ys_json.json())["data"]["list"][0]["data"][3]["value"]
         _result = "\n游戏内ID：" + str(Ys_Game_ID) + "\n游戏内名称：" + YS_Game_Name + "\n服务器：" + Ys_Game_Region + \
-                  "\n等级：" + str(Ys_Game_Leve) + "\n活跃天数：" + str(Ys_Game_Day) + "\n拥有角色数量" + \
+                  "\n等级：" + str(Ys_Game_Leve) + "\n活跃天数：" + str(Ys_Game_Day) + "\n拥有角色数量：" + \
                   str(Ys_Game_role_num) + "\n完成成就数：" + str(Ys_Game_achi_num) + "\n深境螺旋：" + str(Ys_Game_tower_num)
         _result = "----------*-----------\n" + "            原神玩家数据        " + _result
         return _result
@@ -111,3 +120,30 @@ class get_MiYouShe:
                   str(bh3_Game_role_num) + "\n装甲数：" + str(bh3_Game_achi_num) + "\n服装数：" + str(bh3_Game_tower_num)
         _result = "----------*-----------\n" + "            崩坏3玩家数据        " + _result
         return _result
+
+    def get_UID_MiYouShe_more(self,UID,SV):
+        _result=""
+        if SV == "官服":
+            server="cn_gf01"
+        else: server="cn_gf02"
+        payload = {"server":server,"role_id": str(UID)}
+        urls = "https://api-takumi.mihoyo.com/game_record/genshin/api/index?"
+        MIYouShe_ys_json = requests.get(urls, params=payload,headers=self.get_Header())
+        _MiYouShe_ys_Role_Path=(MIYouShe_ys_json.json())["data"]["avatars"]
+        _MiYouShe_ys_Role_Path_2 = (MIYouShe_ys_json.json())["data"]["world_explorations"]
+        for _MiYouShe_ys_Role_Path_open in _MiYouShe_ys_Role_Path:
+            _result_air=""
+            _result_air = "\n角色名：" + str(_MiYouShe_ys_Role_Path_open["name"]) + "\n等级：" + \
+                      str(_MiYouShe_ys_Role_Path_open["fetter"]) + "\n好感度：" + str(_MiYouShe_ys_Role_Path_open["level"])
+            _result=_result+_result_air
+        _result=_result+"\n---------------"
+        for _MiYouShe_ys_Role_Path_open in _MiYouShe_ys_Role_Path_2:
+            _result_air="\n"+_MiYouShe_ys_Role_Path_open["name"]+"等级:"+str(_MiYouShe_ys_Role_Path_open["level"])
+            _result=_result+_result_air
+        _result = "----------*-----------\n" + "            原神角色数据        " + _result
+        return _result
+
+
+
+
+

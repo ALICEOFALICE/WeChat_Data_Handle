@@ -27,6 +27,14 @@ def echo(message):
     elif re.match('BV', User):
         UID = message.content
         tag = bilibili_info().get_video_info(UID)
+    elif re.match('官服|B服', User):
+        UID = message.content
+        if re.match('官服', UID):
+            SV="官服"
+        else:SV="B服"
+        UID=re.sub("官服|B服","",UID)
+        print(UID)
+        tag = MiYouShe.get_UID_MiYouShe_more(UID,SV)
     else:
         tag = ("----------*-----------\n" + (" "*4)+"桜火查询助手" +(" "*4) + "\n原神查询------ys+米游社UID"+ \
             "\n崩坏3查询 ---bh3 + 米游社UID" + "\n米游社查询---mys+米游社UID"+"\nB站视频查询---BV号")
